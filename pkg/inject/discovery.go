@@ -1,8 +1,8 @@
 package inject
 
 import (
-	"github.com/Mutezebra/tiktok/pkg/discovery"
-	"github.com/Mutezebra/tiktok/pkg/log"
+	"github.com/mutezebra/tiktok/pkg/discovery"
+	"github.com/mutezebra/tiktok/pkg/log"
 )
 
 type Registry struct {
@@ -26,7 +26,7 @@ type Resolver struct {
 	*discovery.Resolver
 }
 
-func NewResolver() (*Resolver, error) {
-	re, err := discovery.NewResolver()
+func NewResolver(endpoint string) (*Resolver, error) {
+	re, err := discovery.NewResolver(endpoint)
 	return &Resolver{re}, err
 }

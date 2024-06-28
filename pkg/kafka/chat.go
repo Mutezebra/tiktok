@@ -2,23 +2,24 @@ package kafka
 
 import (
 	"context"
+	"github.com/segmentio/kafka-go"
+
 	"io"
 	"os"
 	"os/signal"
 
+	"github.com/mutezebra/tiktok/pkg/consts"
+	"github.com/mutezebra/tiktok/pkg/log"
 	"github.com/pkg/errors"
-	"github.com/segmentio/kafka-go"
-
-	"github.com/Mutezebra/tiktok/config"
-	"github.com/Mutezebra/tiktok/consts"
-	"github.com/Mutezebra/tiktok/pkg/log"
 )
 
 type MQModel struct {
+	network string
+	address string
 }
 
 func (m *MQModel) CreateTopic(topic string, partitions int, replicationFactors int) error {
-	conn, err := kafka.Dial(config.Conf.Kafka.Network, config.Conf.Kafka.Address)
+	conn, err := kafka.Dial(m.network, m.address)
 	if err != nil {
 		return errors.Wrap(err, "failed to dial kafka")
 	}
@@ -49,7 +50,7 @@ func (m *MQModel) RunGroupReader(ctx context.Context, topic string, groupID stri
 	defer closeAllConn(closeFns)
 
 	cfg := kafka.ReaderConfig{
-		Brokers:     []string{config.Conf.Kafka.Address},
+		Brokers:     []string{m.address},
 		GroupID:     groupID,
 		Topic:       topic,
 		MinBytes:    consts.ReaderDefaultMinBytes,
@@ -83,7 +84,7 @@ func (m *MQModel) RunWriter(ctx context.Context, topic string, ch chan []byte) {
 	closeFns := make([]func(), 0, 1)
 
 	w := &kafka.Writer{
-		Addr:                   kafka.TCP(config.Conf.Kafka.Address),
+		Addr:                   kafka.TCP(m.address),
 		Topic:                  topic,
 		Balancer:               &kafka.RoundRobin{},
 		MaxAttempts:            consts.WriterDefaultAttempts,

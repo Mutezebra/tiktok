@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	etcd "go.etcd.io/etcd/client/v3"
 
-	"github.com/Mutezebra/tiktok/pkg/log"
+	"github.com/mutezebra/tiktok/pkg/log"
 )
 
 type Registry struct {
@@ -21,7 +21,7 @@ type Registry struct {
 	keepAliveChan <-chan *etcd.LeaseKeepAliveResponse
 }
 
-func NewRegistry(addr string, key string, ttl int64, prefix ...string) (*Registry, error) {
+func NewRegistry(addr string, key string, ttl int64, endPoint string, prefix ...string) (*Registry, error) {
 	if len(prefix) > 1 {
 		return nil, errors.New("the size of prefix must be 0 or 1")
 	}
@@ -35,7 +35,7 @@ func NewRegistry(addr string, key string, ttl int64, prefix ...string) (*Registr
 	if ttl == 0 {
 		ttl = 15
 	}
-	client, err := newClient()
+	client, err := newClient(endPoint)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to create the etcd client")
 	}
