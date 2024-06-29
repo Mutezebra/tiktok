@@ -59,24 +59,21 @@ func (r *Registry) Register(ctx context.Context) error {
 
 	putCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
-	key := ""
-	if r.Prefix != "" {
-		key = r.Prefix + r.Key
-	}
-	_, err = r.client.Put(putCtx, key, r.Addr, etcd.WithLease(r.leaseID))
+
+	_, err = r.client.Put(putCtx, r.Key, r.Addr, etcd.WithLease(r.leaseID))
 	if err != nil {
 		_ = r.client.Close()
 		log.LogrusObj.Errorf("failed when put user info to etcd,error: %v", err)
 		return errors.WithMessage(err, "etcd client put server failed")
 	}
-	log.LogrusObj.Infof("have regist user info to etcd,key: %s,value: %s", key, r.Addr)
+	log.LogrusObj.Infof("have regist user info to etcd,key: %s,value: %s", r.Key, r.Addr)
 	go r.keepAlive(ctx)
 	return nil
 }
 
 func (r *Registry) MustRegister(ctx context.Context) {
 	if err := r.Register(ctx); err != nil {
-		panic(err)
+		log.LogrusObj.Panic(err)
 	}
 }
 

@@ -1,12 +1,13 @@
 package inject
 
 import (
+	"context"
 	"github.com/mutezebra/tiktok/pkg/discovery"
 	"github.com/mutezebra/tiktok/pkg/log"
 )
 
 type Registry struct {
-	*discovery.Registry
+	reg      *discovery.Registry
 	Key      string
 	Prefix   string
 	TTL      int64
@@ -20,7 +21,19 @@ func NewRegistry(registry *Registry) *Registry {
 		log.LogrusObj.Panic(err)
 		return nil
 	}
-	return &Registry{Registry: reg}
+	return &Registry{reg: reg}
+}
+
+func (r *Registry) Close() {
+	r.reg.Close()
+}
+
+func (r *Registry) Register(ctx context.Context) error {
+	return r.reg.Register(ctx)
+}
+
+func (r *Registry) MustRegister(ctx context.Context) {
+	r.reg.MustRegister(ctx)
 }
 
 type Resolver struct {
