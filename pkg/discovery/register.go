@@ -21,16 +21,13 @@ type Registry struct {
 	keepAliveChan <-chan *etcd.LeaseKeepAliveResponse
 }
 
-func NewRegistry(addr string, key string, ttl int64, endPoint string, prefix ...string) (*Registry, error) {
-	if len(prefix) > 1 {
+func NewRegistry(addr string, key string, ttl int64, endPoint string, prefix string) (*Registry, error) {
+	if len(prefix) < 1 {
 		return nil, errors.New("the size of prefix must be 0 or 1")
 	}
-	pre := ""
-	if prefix != nil {
-		pre = prefix[0]
-		if pre[len(pre)-1] != '/' {
-			pre += "/"
-		}
+	pre := prefix
+	if prefix[len(prefix)-1] != '/' {
+		pre += "/"
 	}
 	if ttl == 0 {
 		ttl = 15

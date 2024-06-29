@@ -7,14 +7,15 @@ import (
 
 type Registry struct {
 	*discovery.Registry
-	Key    string
-	Prefix string
-	TTL    int64
-	Addr   string
+	Key      string
+	Prefix   string
+	TTL      int64
+	Addr     string
+	EndPoint string
 }
 
 func NewRegistry(registry *Registry) *Registry {
-	reg, err := discovery.NewRegistry(registry.Addr, registry.Key, registry.TTL, registry.Prefix)
+	reg, err := discovery.NewRegistry(registry.Addr, registry.Key, registry.TTL, registry.EndPoint, registry.Prefix)
 	if err != nil {
 		log.LogrusObj.Panic(err)
 		return nil
