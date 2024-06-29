@@ -64,11 +64,12 @@ func (r *Registry) Register(ctx context.Context) error {
 		key = r.Prefix + r.Key
 	}
 	_, err = r.client.Put(putCtx, key, r.Addr, etcd.WithLease(r.leaseID))
-
 	if err != nil {
 		_ = r.client.Close()
+		log.LogrusObj.Errorf("failed when put user info to etcd,error: %v", err)
 		return errors.WithMessage(err, "etcd client put server failed")
 	}
+	log.LogrusObj.Infof("have regist user info to etcd,key: %s,value: %s", key, r.Addr)
 	go r.keepAlive(ctx)
 	return nil
 }
